@@ -1,17 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
+  </head>
+  <body
+    style="
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    "
+  >
+  <style>
+    button {
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        border: 0;
+        background-color: black;
+        color: white;
+        border-radius: 4px;
+    }
+  </style>
     <h1>Welcome!</h1>
     <div>Here is someting</div>
     <div>for your listening pleasure.</div>
-    <audio controls  autoplay id="audio-player">
-        <source src="Moonchild - ＂The List＂ (Official Video).mp3" type="audio/mpeg">
+    <audio controls autoplay id="audio-player">
+      <source
+        src="Moonchild - ＂The List＂ (Official Video).mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <div>Hope you're enjoying the tune above?</div>
-</body>
+
+    <div style="margin-top: 40px;">Which song would you like to listen to next?</div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+        <div style="display: flex; gap: 10px;"><div>Coco Jones - "ICU"</div> <span id="art1"></span> <button onclick="voteArtist('rs4JNkTPy2ha8TtiVjdB')">Vote</button></div>
+        <div style="display: flex; gap: 10px;"><div>Rihanna - "Diamonds"</div> <span id="art2"></span> <button onclick="voteArtist('Cx5oEkmfW8Pa5e5zboyH')">Vote</button></div>
+        <div style="display: flex; gap: 10px;"><div>Justin Bieber - "Sorry"</div> <span id="art3"></span> <button onclick="voteArtist('F1WwCQ2EY28acpDdsgSk')">Vote</button></div>
+        <div style="display: flex; gap: 10px;"><div>Moonchild - Back to me</div> <span id="art4"></span> <button onclick="voteArtist('yWfMZG3swsEHIcUNMKeD')">Vote</button></div>
+    </div>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        onSnapshot,
+        updateDoc,
+        doc,
+        increment,
+      } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+      // Your web app's Firebase configuration
+      // !!! IMPORTANT: Replace with your actual Firebase project configuration !!!
+      const firebaseConfig = {
+        apiKey: "AIzaSyAyM6cufPlZS05gE30_Cbd6Pf5_lQnwp7M",
+        authDomain: "fireb-test-a8fd3.firebaseapp.com",
+        databaseURL: "https://fireb-test-default-rtdb.firebaseio.com",
+        projectId: "fireb-test",
+        storageBucket: "fireb-test.appspot.com",
+        messagingSenderId: "670031911608",
+        appId: "1:670031911608:web:a98583442c79008012b24d",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      // Get a reference to the Firestore service
+      const db = getFirestore(app);
+
+      // Get a reference to the 'artists' collection
+      const artistsColRef = collection(db, "artists");
+
+      const outputDiv = document.getElementById("output");
+
+      const data = [];
+
+      // Set up a real-time listener for the 'artists' collection
+      // This will log every document in the 'artists' collection whenever it changes
+
+      const loadIt = () => {
+          onSnapshot(
+            artistsColRef,
+            (snapshot) => {
+            //   outputDiv.innerHTML = "<h2>Current Artists:</h2>";
+              if (snapshot.empty) {
+                // outputDiv.innerHTML += "<p>No artists found.</p>";
+              } else {
+                snapshot.forEach((doc) => {
+                    document.querySelector("#" + doc.data().title).innerText = "(Vote count: " + doc.data().votecount + ")";
+                });
+              }
+            },
+            (error) => {
+              console.error("Error listening to artists collection: ", error);
+            },
+          );
+      }
+
+      loadIt();
+
+
+      window.voteArtist = async (id) => {
+        const artistDocRef = doc(db, 'artists', id);
+        await updateDoc(artistDocRef, {
+        votecount: increment(1)
+      });
+      };
+
+    </script>
+  </body>
 </html>
